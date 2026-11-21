@@ -199,7 +199,7 @@ textarea{width:100%;min-height:170px;font-weight:600;line-height:1.6}
   <img id="lcwImg" alt="">
   <div class="word" id="lcwWord"></div>
   <input type="text" id="lcwIn" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="write the word" disabled>
-  <div class="row" style="justify-content:center;margin-top:0"><button class="btn" id="lcwBtn">Hide</button><button class="btn ghost" id="lcwSay">🔊</button></div>
+  <div class="row" style="justify-content:center;margin-top:0"><button class="btn" id="lcwBtn">Hide</button></div>
   <span class="feedback" id="lcwFb"></span>
  </div>
 </section>
@@ -312,9 +312,9 @@ const pair=w=>'one '+w.s+', two '+w.p;
 /* 2 pairs */
 (function(){const L=$('pL'),R=$('pR');let sel=null,done=0;const pl=W.filter(w=>w.s!==w.p);
  /* fish & sheep would be identical pairs; use the 8 changing words */
- shuffle(pl).forEach(w=>{const b=el('button','chip',w.s);b.onclick=()=>{if(b.classList.contains('good'))return;L.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=w;say(w.s,.8)};L.appendChild(b)});
+ shuffle(pl).forEach(w=>{const b=el('button','chip',w.s);b.onclick=()=>{if(b.classList.contains('good'))return;L.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=w};L.appendChild(b)});
  shuffle(pl).forEach(w=>{const b=el('button','chip',w.p);b.onclick=()=>{if(b.classList.contains('good'))return;if(!sel){say_fb('pFb','no','Сначала нажми слово слева.');return}
-  if(sel===w){b.classList.add('good');L.querySelectorAll('.sel').forEach(x=>{x.classList.remove('sel');x.classList.add('good')});sel=null;done++;say(pair(w),.8);say_fb('pFb',done===pl.length?'ok':'',done===pl.length?'All pairs found!':done+' / '+pl.length);if(done===pl.length)win('pairs')}
+  if(sel===w){b.classList.add('good');L.querySelectorAll('.sel').forEach(x=>{x.classList.remove('sel');x.classList.add('good')});sel=null;done++;say_fb('pFb',done===pl.length?'ok':'',done===pl.length?'All pairs found!':done+' / '+pl.length);if(done===pl.length)win('pairs')}
   else{b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),400);say_fb('pFb','no','Not a pair. Try again!')}};R.appendChild(b)})})();
 
 /* 3 sort by trick */
@@ -327,7 +327,7 @@ const pair=w=>'one '+w.s+', two '+w.p;
 
 /* 4 one -> many */
 (function(){const box=$('o2m'),checks=[];shuffle(W).forEach((w,i)=>{const c=el('div','pcell');c.innerHTML=`<img src="${IMG[w.s]}" alt="${w.rup}"><span><b>one ${w.s}</b> → two …</span>`;
- const r=el('div','prow');const b=el('button','play','🔊');b.setAttribute('aria-label','listen');b.onclick=()=>say('one '+w.s,.8);const inp=mkIn('plural of '+w.s);r.append(b,inp);const h=el('div','hint');c.append(r,h);box.appendChild(c);checks.push(typed(inp,w.p,{hintEl:h}))});
+ const r=el('div','prow');const inp=mkIn('plural of '+w.s);r.append(inp);const h=el('div','hint');c.append(r,h);box.appendChild(c);checks.push(typed(inp,w.p,{hintEl:h}))});
  $('o2mCheck').onclick=()=>group(checks,'o2mFb','one2many','Super! All ten plurals!')})();
 
 /* 5 many -> one */
@@ -352,7 +352,7 @@ const pair=w=>'one '+w.s+', two '+w.p;
  ws.forEach(w=>{const d=el('div','tilerow');const top=el('div','top2');top.innerHTML=`<img src="${IMG[w.s]}" alt=""><span style="font-weight:800">one ${w.s} → two</span>`;const slot=el('div','slot');top.appendChild(slot);
   const tl=el('div','tiles');let typedS='',used=[];let letters=shuffle([...w.p]);if(letters.join('')===w.p)letters=letters.reverse();
   const tiles=letters.map(ch=>{const t=el('button','tile',ch);t.onclick=()=>{if(slot.classList.contains('good'))return;t.disabled=true;used.push(t);typedS+=ch;slot.textContent=typedS;
-    if(typedS.length===w.p.length){if(typedS===w.p){slot.classList.add('good');done++;say(pair(w),.8);say_fb('tFb',done===total?'ok':'',done===total?'You built all the words!':done+' / '+total);if(done===total)win('tiles')}
+    if(typedS.length===w.p.length){if(typedS===w.p){slot.classList.add('good');done++;say_fb('tFb',done===total?'ok':'',done===total?'You built all the words!':done+' / '+total);if(done===total)win('tiles')}
      else{slot.classList.add('bad');setTimeout(()=>{slot.classList.remove('bad');typedS='';slot.textContent='';used.forEach(u=>u.disabled=false);used=[]},500)}}};tl.appendChild(t);return t});
   const back=el('button','tile','⌫');back.setAttribute('aria-label','delete letter');back.style.background='var(--paper)';back.onclick=()=>{if(slot.classList.contains('good')||!used.length)return;used.pop().disabled=false;typedS=typedS.slice(0,-1);slot.textContent=typedS};tl.appendChild(back);
   d.append(top,tl);box.appendChild(d)})})();
@@ -360,18 +360,18 @@ const pair=w=>'one '+w.s+', two '+w.p;
 /* 8 choose correct spelling */
 (function(){const Q=[['child',['childs','children','childrens']],['mouse',['mouses','mices','mice']],['foot',['foots','feet','feets']],['tooth',['teeth','tooths','teeths']],['goose',['gooses','geese','geeses']],['sheep',['sheeps','sheep','sheepes']],['fish',['fishs','fish','fishis']],['man',['mans','men','mens']],['woman',['womans','women','womens']],['person',['peoples','pepole','people']]];
  const box=$('choose');let done=0;shuffle(Q).forEach(([s,opts],i)=>{const d=el('div','item');d.appendChild(el('span','q',`${i+1}. one ${s} → two`));const o=el('div','opts');let solved=false;
-  shuffle(opts).forEach(x=>{const b=el('button','opt',x);b.onclick=()=>{if(solved)return;if(x===BY[s].p){b.classList.add('good');solved=true;done++;say(pair(BY[s]),.8);say_fb('chFb',done===Q.length?'ok':'',done===Q.length?'Eagle eyes! All correct.':done+' / '+Q.length);if(done===Q.length)win('choose')}else{b.classList.add('bad');say_fb('chFb','no','"'+x+'" — так не пишут!')}};o.appendChild(b)});d.appendChild(o);box.appendChild(d)})})();
+  shuffle(opts).forEach(x=>{const b=el('button','opt',x);b.onclick=()=>{if(solved)return;if(x===BY[s].p){b.classList.add('good');solved=true;done++;say_fb('chFb',done===Q.length?'ok':'',done===Q.length?'Eagle eyes! All correct.':done+' / '+Q.length);if(done===Q.length)win('choose')}else{b.classList.add('bad');say_fb('chFb','no','"'+x+'" — так не пишут!')}};o.appendChild(b)});d.appendChild(o);box.appendChild(d)})})();
 
 /* 9 look, hide, write */
 (function(){const seq=shuffle(W.map(w=>({w,f:'p'})).concat(shuffle(W).slice(0,4).map(w=>({w,f:'s'}))));let i=0,hidden=false;const total=seq.length;
  const img=$('lcwImg'),word=$('lcwWord'),inp=$('lcwIn'),btn=$('lcwBtn');
- function show(){if(i>=total){word.textContent='🐟';word.classList.remove('hidden');inp.hidden=true;btn.hidden=true;$('lcwSay').hidden=true;img.hidden=true;say_fb('lcwFb','ok','All '+total+' words! Your memory is super!');win('lcw');return}
+ function show(){if(i>=total){word.textContent='🐟';word.classList.remove('hidden');inp.hidden=true;btn.hidden=true;img.hidden=true;say_fb('lcwFb','ok','All '+total+' words! Your memory is super!');win('lcw');return}
   const it=seq[i];img.src=IMG[it.w.s];img.alt='';word.textContent=(it.f==='p'?it.w.p:it.w.s);word.classList.remove('hidden');inp.value='';inp.disabled=true;inp.className='';btn.textContent='Hide';hidden=false;$('lcwBar').style.width=(i/total*100)+'%';say_fb('lcwFb','',(i+1)+' / '+total+' · Look and remember!')}
  const cur=()=>seq[i].f==='p'?seq[i].w.p:seq[i].w.s;
  function check(){if(!hidden)return;const v=norm(inp.value);if(!v)return;if(v===cur()){inp.className='right';say_fb('lcwFb','ok','Yes! '+cur());i++;setTimeout(show,700)}else{inp.className='wrong';say_fb('lcwFb','no','Not quite. Look again!');word.classList.remove('hidden');btn.textContent='Hide';hidden=false;inp.disabled=true}}
  btn.onclick=()=>{if(i>=total)return;if(!hidden){word.classList.add('hidden');hidden=true;inp.disabled=false;inp.value='';inp.className='';inp.focus();btn.textContent='Check';say_fb('lcwFb','','Now write it!')}else check()};
  inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
- $('lcwSay').onclick=()=>{if(i<total)say(cur(),.75)};show()})();
+ show()})();
 
 /* 10 listen and write */
 (function(){const box=$('listen'),checks=[];const items=shuffle(W.map(w=>w.p).concat(['man','woman','mouse','goose']));
@@ -380,8 +380,8 @@ const pair=w=>'one '+w.s+', two '+w.p;
 
 /* 11 sentences */
 (function(){const S=[['Simba has got thirty sharp','tooth','.'],['Tonya washes her','foot','before bed.'],['Three','goose','are swimming in the lake.'],['Simba wants to catch the little','mouse','in the garden.'],['There are many','person','in the park today.'],['Two','child','are playing with Tonya.'],['The farmer has got ten','sheep','.'],['Simba is looking at the','fish','in the aquarium.'],['Two','woman','are sitting on the bench.'],['Three','man','are taking photos of Simba.']];
- const box=$('sent'),checks=[];S.forEach(([a,s,b],i)=>{const w=BY[s];const d=el('div','item');d.innerHTML=`<span class="q">${i+1}. ${a}</span>`;const inp=mkIn(s,'120px');const h=el('span','hint');const p=el('button','play','🔊');p.style.cssText='width:34px;height:34px;font-size:15px';p.setAttribute('aria-label','listen');p.onclick=()=>say(a+' hmm '+b,.8);
-  d.append(inp,el('span','q',`${b} <span style="color:var(--muted)">(${s})</span>`),p,h);box.appendChild(d);checks.push(typed(inp,w.p,{hintEl:h}))});
+ const box=$('sent'),checks=[];S.forEach(([a,s,b],i)=>{const w=BY[s];const d=el('div','item');d.innerHTML=`<span class="q">${i+1}. ${a}</span>`;const inp=mkIn(s,'120px');const h=el('span','hint');
+  d.append(inp,el('span','q',`${b} <span style="color:var(--muted)">(${s})</span>`),h);box.appendChild(d);checks.push(typed(inp,w.p,{hintEl:h}))});
  $('seCheck').onclick=()=>group(checks,'seFb','sent','Simba is proud of you!')})();
 
 /* 12 spot the differences */
